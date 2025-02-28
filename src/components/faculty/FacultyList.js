@@ -1,110 +1,68 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { Search, Edit, Trash2, GraduationCap } from 'lucide-react';
-import { setFaculty, setLoading, setError } from '@/redux/features/facultySlice';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
+import { Edit, Trash2, Eye, BookOpen } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import FacultyForm from './FacultyForm';
-import { useRouter } from 'next/navigation';
+import FacultyDetails from './FacultyDetails';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-export default function FacultyList() {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { faculty, loading } = useSelector((state) => state.faculty);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function FacultyList({ faculty, loading, onRefresh }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
 
-  useEffect(() => {
-    const fetchFaculty = async () => {
-      dispatch(setLoading());
+  const handleView = (member) => {
+    setSelectedFaculty(member);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleEdit = (member) => {
+    setSelectedFaculty(member);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDelete = async (facultyId) => {
+    if (window.confirm('Are you sure you want to delete this faculty member?')) {
       try {
-        const response = await axios.get('http://localhost:3001/faculty');
-        dispatch(setFaculty(response.data));
+        await axios.delete(`http://localhost:3001/faculty/${facultyId}`);
+        toast.success('Faculty member deleted successfully');
+        onRefresh();
       } catch (error) {
-        dispatch(setError(error.message));
-        toast.error('Failed to fetch faculty data');
+        console.error('Error deleting faculty:', error);
+        toast.error('Failed to delete faculty member');
       }
-    };
-
-    fetchFaculty();
-  }, [dispatch]);
-
-  const filteredFaculty = faculty.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3001/faculty/${id}`);
-      const updatedFaculty = faculty.filter((member) => member.id !== id);
-      dispatch(setFaculty(updatedFaculty));
-      toast.success('Faculty member removed successfully');
-    } catch (error) {
-      toast.error('Failed to remove faculty member');
     }
   };
 
-  const handleEdit = (id) => {
-    const member = faculty.find((f) => f.id === id);
-    setSelectedFaculty(member);
-    setIsModalOpen(true);
-  };
-
-  const handleAdd = () => {
-    setSelectedFaculty(null);
-    setIsModalOpen(true);
-  };
-
-  const handleViewDashboard = (id) => {
-    router.push(`/faculty/${id}`);
-  };
+  if (loading) {
+    return <div className="text-center py-4">Loading...</div>;
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold">Faculty Members</h2>
-        <div className="flex gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search faculty..."
-              className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button
-            onClick={handleAdd}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Add Faculty
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-4">Loading...</div>
-      ) : (
+    <>
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead>
+            <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  Faculty ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Designation
+                  Name & Contact
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Department
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
+                  Designation
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Courses
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -112,29 +70,65 @@ export default function FacultyList() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredFaculty.map((member) => (
-                <tr key={member.id}>
+              {faculty.map((member) => (
+                <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center cursor-pointer hover:text-blue-600"
-                         onClick={() => handleViewDashboard(member.id)}>
-                      <GraduationCap className="h-5 w-5 text-gray-500 mr-2" />
-                      {member.name}
+                    <div className="text-sm font-medium text-gray-900">
+                      {member.facultyId}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{member.designation}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{member.department}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{member.email}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-2">
+                    <div className="text-sm font-medium text-gray-900">
+                      {member.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {member.email}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {member.department}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {member.designation}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <BookOpen className="h-5 w-5 text-gray-400 mr-2" />
+                      <span className="text-sm text-gray-900">
+                        {member.assignedCourses?.length || 0}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      ${member.status === 'active' ? 'bg-green-100 text-green-800' : 
+                        member.status === 'on_leave' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-red-100 text-red-800'}`}>
+                      {member.status === 'on_leave' ? 'On Leave' : 
+                        member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-3">
                       <button
-                        className="text-blue-600 hover:text-blue-800"
-                        onClick={() => handleEdit(member.id)}
+                        onClick={() => handleView(member)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <Eye size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleEdit(member)}
+                        className="text-indigo-600 hover:text-indigo-900"
                       >
                         <Edit size={18} />
                       </button>
                       <button
-                        className="text-red-600 hover:text-red-800"
                         onClick={() => handleDelete(member.id)}
+                        className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -145,18 +139,35 @@ export default function FacultyList() {
             </tbody>
           </table>
         </div>
-      )}
+      </div>
 
+      {/* Edit Modal */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={selectedFaculty ? 'Edit Faculty Member' : 'Add New Faculty Member'}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Faculty Member"
       >
         <FacultyForm
           faculty={selectedFaculty}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={() => {
+            setIsEditModalOpen(false);
+            onRefresh();
+          }}
         />
       </Modal>
-    </div>
+
+      {/* Details Modal */}
+      <Modal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        title="Faculty Details"
+      >
+        <FacultyDetails
+          faculty={selectedFaculty}
+          onClose={() => setIsDetailsModalOpen(false)}
+        />
+      </Modal>
+    </>
   );
 } 
