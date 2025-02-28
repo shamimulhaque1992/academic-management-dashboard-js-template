@@ -1,0 +1,127 @@
+{
+  "students": [
+    {
+      "id": 1,
+      "studentId": "CSE2019001",
+      "name": "Abdullah Rahman",
+      "email": "abdullah.rahman@example.com",
+      "phone": "01712345678",
+      "department": "CSE",
+      "batch": "2019",
+      "gpa": 3.92,
+      "enrolledCourses": [1, 2, 3]
+    },
+    {
+      "id": 2,
+      "studentId": "CSE2019002",
+      "name": "Fatima Akter",
+      "email": "fatima.akter@example.com",
+      "phone": "01812345678",
+      "department": "CSE",
+      "batch": "2019",
+      "gpa": 3.88,
+      "enrolledCourses": [1, 2, 4]
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "courseCode": "CSE101",
+      "title": "Introduction to Programming",
+      "credits": 3,
+      "facultyId": 1,
+      "enrollmentCount": 45,
+      "description": "Basic concepts of programming using C/C++"
+    },
+    {
+      "id": 2,
+      "courseCode": "CSE201",
+      "title": "Data Structures",
+      "credits": 3,
+      "facultyId": 2,
+      "enrollmentCount": 40,
+      "description": "Fundamental data structures and algorithms"
+    },
+    {
+      "id": 3,
+      "courseCode": "CSE203",
+      "title": "Digital Logic Design",
+      "credits": 3,
+      "facultyId": 1,
+      "enrollmentCount": 38,
+      "description": "Boolean algebra and digital circuits"
+    },
+    {
+      "id": 4,
+      "courseCode": "CSE301",
+      "title": "Database Management Systems",
+      "credits": 3,
+      "facultyId": 2,
+      "enrollmentCount": 42,
+      "description": "Database design and SQL"
+    },
+    {
+      "id": 5,
+      "courseCode": "CSE311",
+      "title": "Computer Networks",
+      "credits": 3,
+      "facultyId": 3,
+      "enrollmentCount": 35,
+      "description": "Network protocols and architecture"
+    }
+  ],
+  "faculty": [
+    {
+      "id": 1,
+      "name": "Dr. Mohammad Islam",
+      "email": "mohammad.islam@example.com",
+      "department": "CSE",
+      "designation": "Professor",
+      "courses": [1, 3],
+      "specialization": "Computer Networks"
+    },
+    {
+      "id": 2,
+      "name": "Dr. Ayesha Begum",
+      "email": "ayesha.begum@example.com",
+      "department": "CSE",
+      "designation": "Associate Professor",
+      "courses": [2, 4],
+      "specialization": "Database Systems"
+    },
+    {
+      "id": 3,
+      "name": "Dr. Kamal Hossain",
+      "email": "kamal.hossain@example.com",
+      "department": "CSE",
+      "designation": "Assistant Professor",
+      "courses": [5],
+      "specialization": "Artificial Intelligence"
+    },
+    {
+      "id": 4,
+      "name": "Prof. Nasrin Ahmed",
+      "email": "nasrin.ahmed@example.com",
+      "department": "CSE",
+      "designation": "Professor",
+      "courses": [],
+      "specialization": "Software Engineering"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": 1,
+      "studentId": 1,
+      "courseId": 1,
+      "grade": "A",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": 2,
+      "studentId": 1,
+      "courseId": 2,
+      "grade": "A-",
+      "semester": "Fall 2023"
+    }
+  ]
+} 

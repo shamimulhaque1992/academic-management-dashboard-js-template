@@ -1,101 +1,108 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { BarChart, Users, BookOpen, GraduationCap } from "lucide-react";
+import TopStudentsTable from '@/components/dashboard/TopStudentsTable';
+import PopularCoursesTable from '@/components/dashboard/PopularCoursesTable';
+import EnrollmentChart from '@/components/analytics/EnrollmentChart';
+import GradeDistribution from '@/components/analytics/GradeDistribution';
 
-export default function Home() {
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalCourses: 0,
+    totalFaculty: 0,
+  });
+  const [topStudents, setTopStudents] = useState([]);
+  const [popularCourses, setPopularCourses] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [studentsRes, coursesRes, facultyRes, enrollmentsRes] = await Promise.all([
+          axios.get("http://localhost:3001/students"),
+          axios.get("http://localhost:3001/courses"),
+          axios.get("http://localhost:3001/faculty"),
+          axios.get("http://localhost:3001/enrollments"),
+        ]);
+
+        // Set basic stats
+        setStats({
+          totalStudents: studentsRes.data.length,
+          totalCourses: coursesRes.data.length,
+          totalFaculty: facultyRes.data.length,
+        });
+
+        // Process top students (sort by GPA)
+        const sortedStudents = [...studentsRes.data].sort((a, b) => b.gpa - a.gpa);
+        setTopStudents(sortedStudents.slice(0, 5));
+
+        // Process popular courses
+        const courseEnrollments = coursesRes.data.map(course => ({
+          ...course,
+          enrollmentCount: enrollmentsRes.data.filter(e => e.courseId === course.id).length
+        }));
+        const sortedCourses = courseEnrollments.sort((a, b) => b.enrollmentCount - a.enrollmentCount);
+        setPopularCourses(sortedCourses.slice(0, 5));
+
+        setEnrollments(enrollmentsRes.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-8">Dashboard Overview</h1>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="Total Students"
+          value={stats.totalStudents}
+          icon={<Users className="h-8 w-8 text-blue-500" />}
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your change instantly.</li>
-        </ol>
+        <StatCard
+          title="Total Courses"
+          value={stats.totalCourses}
+          icon={<BookOpen className="h-8 w-8 text-green-500" />}
+        />
+        <StatCard
+          title="Faculty Members"
+          value={stats.totalFaculty}
+          icon={<GraduationCap className="h-8 w-8 text-purple-500" />}
+        />
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      {/* Top Students & Popular Courses */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <TopStudentsTable students={topStudents} />
+        <PopularCoursesTable courses={popularCourses} />
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <EnrollmentChart courses={popularCourses} />
+        <GradeDistribution enrollments={enrollments} />
+      </div>
     </div>
   );
 }
+
+const StatCard = ({ title, value, icon }) => {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-gray-500 text-sm">{title}</p>
+          <p className="text-2xl font-bold mt-2">{value}</p>
+        </div>
+        {icon}
+      </div>
+    </div>
+  );
+};
