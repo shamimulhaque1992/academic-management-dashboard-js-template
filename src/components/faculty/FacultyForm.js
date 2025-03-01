@@ -3,143 +3,184 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-export default function FacultyForm({ faculty, onClose, onSuccess }) {
+export default function FacultyForm({ onClose, onSuccess, editData }) {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     facultyId: '',
     name: '',
     email: '',
     phone: '',
-    department: 'CSE',
-    designation: 'Lecturer',
-    specialization: '',
-    qualifications: '',
-    joinDate: '',
-    status: 'active',
+    designation: '',
+    department: '',
+    status: 'Active',
     assignedCourses: []
   });
 
+  // Reset form when editData changes
   useEffect(() => {
-    if (faculty) {
+    if (editData) {
       setFormData({
-        ...faculty,
-        joinDate: faculty.joinDate?.split('T')[0] || ''
+        id: editData.id,
+        facultyId: editData.facultyId || '',
+        name: editData.name || '',
+        email: editData.email || '',
+        phone: editData.phone || '',
+        designation: editData.designation || '',
+        department: editData.department || '',
+        status: editData.status || 'Active',
+        assignedCourses: []
       });
     }
-  }, [faculty]);
+  }, [editData]);
+
+  // Fetch courses and faculty-courses data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const coursesRes = await axios.get('http://localhost:3001/courses');
+        setCourses(coursesRes.data);
+
+        if (editData?.id) {
+          const facultyCoursesRes = await axios.get(`http://localhost:3001/faculty-courses?facultyId=${editData.id}`);
+          const assignedCourseIds = facultyCoursesRes.data.map(fc => fc.courseId.toString());
+          setFormData(prev => ({
+            ...prev,
+            assignedCourses: assignedCourseIds
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [editData?.id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (faculty) {
-        // Update existing faculty
-        await axios.put(`http://localhost:3001/faculty/${faculty.id}`, formData);
-        toast.success('Faculty member updated successfully');
-      } else {
-        // Add new faculty
-        await axios.post('http://localhost:3001/faculty', {
+      let facultyId;
+      
+      if (editData) {
+        // Update existing faculty with assignedCourses included
+        await axios.put(`http://localhost:3001/faculty/${editData.id}`, {
           ...formData,
-          assignedCourses: []
+          id: editData.id,
+          assignedCourses: formData.assignedCourses // Include assignedCourses in faculty data
         });
-        toast.success('Faculty member added successfully');
+        facultyId = editData.id;
+        
+        // Delete existing course assignments
+        const existingAssignments = await axios.get(`http://localhost:3001/faculty-courses?facultyId=${editData.id}`);
+        await Promise.all(
+          existingAssignments.data.map(assignment =>
+            axios.delete(`http://localhost:3001/faculty-courses/${assignment.id}`)
+          )
+        );
+      } else {
+        // Create new faculty with assignedCourses included
+        const facultyRes = await axios.post('http://localhost:3001/faculty', {
+          ...formData,
+          assignedCourses: formData.assignedCourses // Include assignedCourses in faculty data
+        });
+        facultyId = facultyRes.data.id;
       }
 
+      // Create faculty-course assignments
+      await Promise.all(
+        formData.assignedCourses.map(courseId =>
+          axios.post('http://localhost:3001/faculty-courses', {
+            facultyId: facultyId,
+            courseId: parseInt(courseId)
+          })
+        )
+      );
+
       // Refresh faculty list
-      const response = await axios.get('http://localhost:3001/faculty');
-      onSuccess(response.data);
+      const updatedFacultyRes = await axios.get('http://localhost:3001/faculty');
+      onSuccess(updatedFacultyRes.data);
+      toast.success(`Faculty ${editData ? 'updated' : 'created'} successfully`);
+      onClose();
     } catch (error) {
-      console.error('Error saving faculty:', error);
-      toast.error('Failed to save faculty member');
+      console.error('Error:', error);
+      toast.error(`Failed to ${editData ? 'update' : 'create'} faculty`);
     }
   };
 
+  if (loading) {
+    return <div className="flex justify-center items-center p-4">Loading...</div>;
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Faculty ID */}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Faculty ID
           </label>
           <input
             type="text"
+            required
             value={formData.facultyId}
             onChange={(e) => setFormData({ ...formData, facultyId: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
+            className="w-full border rounded-md p-2"
           />
         </div>
 
-        {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Name
           </label>
           <input
             type="text"
+            required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
+            className="w-full border rounded-md p-2"
           />
         </div>
 
-        {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
           </label>
           <input
             type="email"
+            required
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
+            className="w-full border rounded-md p-2"
           />
         </div>
 
-        {/* Phone */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Phone
           </label>
           <input
-            type="tel"
+            type="text"
+            required
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
+            className="w-full border rounded-md p-2"
           />
         </div>
 
-        {/* Department */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Department
-          </label>
-          <select
-            value={formData.department}
-            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          >
-            <option value="CSE">Computer Science</option>
-            <option value="EEE">Electrical Engineering</option>
-            <option value="ME">Mechanical Engineering</option>
-            <option value="CE">Civil Engineering</option>
-          </select>
-        </div>
-
-        {/* Designation */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Designation
           </label>
           <select
+            required
             value={formData.designation}
             onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
+            className="w-full border rounded-md p-2"
           >
+            <option value="">Select Designation</option>
             <option value="Professor">Professor</option>
             <option value="Associate Professor">Associate Professor</option>
             <option value="Assistant Professor">Assistant Professor</option>
@@ -147,79 +188,86 @@ export default function FacultyForm({ faculty, onClose, onSuccess }) {
           </select>
         </div>
 
-        {/* Join Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Join Date
-          </label>
-          <input
-            type="date"
-            value={formData.joinDate}
-            onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          />
-        </div>
-
-        {/* Status */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <select
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            required
-          >
-            <option value="active">Active</option>
-            <option value="on_leave">On Leave</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-
-        {/* Specialization */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Specialization
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Department
           </label>
           <input
             type="text"
-            value={formData.specialization}
-            onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            placeholder="e.g., Machine Learning, Database Systems"
+            required
+            value={formData.department}
+            onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+            className="w-full border rounded-md p-2"
           />
         </div>
 
-        {/* Qualifications */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Qualifications
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status
           </label>
-          <textarea
-            value={formData.qualifications}
-            onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
-            rows={3}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-            placeholder="Enter academic qualifications..."
-          />
+          <select
+            required
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            className="w-full border rounded-md p-2"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 mt-6">
+      {/* Course Assignment Section */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Assign Courses
+        </label>
+        <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {courses.map(course => (
+              <div key={course.id} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`course-${course.id}`}
+                  checked={formData.assignedCourses.includes(course.id.toString())}
+                  onChange={(e) => {
+                    const courseId = course.id.toString();
+                    if (e.target.checked) {
+                      setFormData({
+                        ...formData,
+                        assignedCourses: [...formData.assignedCourses, courseId]
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        assignedCourses: formData.assignedCourses.filter(id => id !== courseId)
+                      });
+                    }
+                  }}
+                  className="rounded border-gray-300 mr-2"
+                />
+                <label htmlFor={`course-${course.id}`} className="text-sm">
+                  {course.courseCode} - {course.title}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+          className="px-4 py-2 text-gray-600 hover:text-gray-800"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          {faculty ? 'Update' : 'Add'} Faculty
+          {editData ? 'Update Faculty' : 'Create Faculty'}
         </button>
       </div>
     </form>

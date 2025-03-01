@@ -161,18 +161,13 @@
       "name": "Dr. Mohammad Islam",
       "email": "mohammad.islam@example.com",
       "phone": "01711111111",
-      "department": "CSE",
       "designation": "Professor",
-      "courses": [
-        1,
-        3
-      ],
-      "specialization": "Computer Networks",
-      "joinDate": "2015-03-05",
+      "department": "CSE",
       "status": "Active",
       "assignedCourses": [
         "1",
-        "3"
+        "3",
+        "5"
       ]
     },
     {
@@ -318,43 +313,62 @@
       "courseId": 2,
       "grade": "A",
       "semester": "Fall 2023"
+    },
+    {
+      "id": "f2f2",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T09:55:31.782Z",
+      "grade": null
+    },
+    {
+      "id": "b379",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T09:56:10.120Z",
+      "grade": null
     }
   ],
   "faculty-courses": [
     {
-      "id": 1,
-      "facultyId": 1,
-      "courseId": 1
-    },
-    {
-      "id": 2,
-      "facultyId": 1,
-      "courseId": 3
-    },
-    {
-      "id": 3,
+      "id": "3",
       "facultyId": 2,
       "courseId": 2
     },
     {
-      "id": 4,
+      "id": "4",
       "facultyId": 2,
       "courseId": 4
     },
     {
-      "id": 5,
+      "id": "5",
       "facultyId": 3,
       "courseId": 5
     },
     {
-      "id": 6,
+      "id": "6",
       "facultyId": 3,
       "courseId": 6
     },
     {
-      "id": 7,
+      "id": "7",
       "facultyId": 4,
       "courseId": 7
+    },
+    {
+      "id": "3893",
+      "facultyId": "1",
+      "courseId": 1
+    },
+    {
+      "id": "adfd",
+      "facultyId": "1",
+      "courseId": 3
+    },
+    {
+      "id": "a083",
+      "facultyId": "1",
+      "courseId": 5
     }
   ]
 }
