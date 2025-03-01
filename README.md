@@ -163,4 +163,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Next.js team for the amazing framework
 - Tailwind CSS for the utility-first CSS framework
 - ApexCharts for beautiful charts
-- All contributors who help improve this project
