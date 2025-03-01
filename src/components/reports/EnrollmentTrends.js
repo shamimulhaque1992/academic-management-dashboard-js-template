@@ -71,43 +71,86 @@ export default function EnrollmentTrends() {
       height: 400,
       stacked: true,
       toolbar: {
-        show: true
-      }
+        show: true,
+        tools: {
+          download: true,
+          selection: false,
+          zoom: false,
+          zoomin: false,
+          zoomout: false,
+          pan: false,
+        }
+      },
+      animations: {
+        enabled: true
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          legend: {
+            position: 'bottom',
+            offsetY: 7
+          }
+        }
+      }]
     },
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: '55%',
-        borderRadius: 4
+        columnWidth: '70%',
+        borderRadius: 4,
+        dataLabels: {
+          position: 'top'
+        }
       }
     },
     dataLabels: {
-      enabled: false
+      enabled: false,
+      style: {
+        fontSize: '12px'
+      }
     },
     xaxis: {
       categories: enrollmentData.map(item => item.courseName),
       labels: {
         rotate: -45,
+        trim: true,
         style: {
-          fontSize: '12px'
+          fontSize: '10px',
+          fontFamily: 'inherit'
         }
       }
     },
     yaxis: {
       title: {
-        text: 'Number of Students'
+        text: 'Students',
+        style: {
+          fontSize: '12px'
+        }
+      },
+      labels: {
+        style: {
+          fontSize: '10px'
+        }
       }
     },
     colors: ['#3B82F6', '#10B981'],
     title: {
-      text: 'Current Course Enrollment Distribution',
+      text: 'Course Enrollment Distribution',
       align: 'center',
       style: {
-        fontSize: '20px'
+        fontSize: '16px',
+        fontWeight: '600'
       }
     },
     legend: {
-      position: 'top'
+      position: 'top',
+      fontSize: '12px',
+      markers: {
+        width: 12,
+        height: 12,
+        radius: 12
+      }
     }
   };
 
@@ -160,12 +203,12 @@ export default function EnrollmentTrends() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-x-4">
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedView('current')}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedView === 'current'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -175,7 +218,7 @@ export default function EnrollmentTrends() {
           </button>
           <button
             onClick={() => setSelectedView('trend')}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedView === 'trend'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -186,63 +229,80 @@ export default function EnrollmentTrends() {
         </div>
         <button
           onClick={handleExport}
-          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          className="flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
         >
-          <Download size={20} className="mr-2" />
-          Export Data
+          <Download size={16} className="mr-2" />
+          Export
         </button>
       </div>
 
-      <div className="mt-4">
-        {selectedView === 'current' ? (
-          <Chart
-            options={currentChartOptions}
-            series={currentSeries}
-            type="bar"
-            height={400}
-          />
-        ) : (
-          <Chart
-            options={trendChartOptions}
-            series={timeframeData}
-            type="line"
-            height={400}
-          />
-        )}
+      <div className="mt-4 -mx-2 sm:mx-0">
+        <div className="w-full overflow-hidden">
+          <div className="min-w-[300px]">
+            <Chart
+              options={{
+                ...currentChartOptions,
+                chart: {
+                  ...currentChartOptions.chart,
+                  toolbar: {
+                    show: true,
+                    tools: {
+                      download: true,
+                      selection: false,
+                      zoom: false,
+                      zoomin: false,
+                      zoomout: false,
+                      pan: false,
+                    }
+                  }
+                }
+              }}
+              series={currentSeries}
+              type="bar"
+              height={350}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Summary Table */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">Enrollment Summary</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Enrollments
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Active Students
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Completed
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {enrollmentData.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.courseName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.enrollmentCount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.activeStudents}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{item.completedStudents}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="mt-6">
+        <h3 className="text-base font-semibold text-gray-800 mb-3">Enrollment Summary</h3>
+        <div className="overflow-x-auto -mx-2 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Course
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Active
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Completed
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {enrollmentData.map((item, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 text-sm text-gray-900 font-medium truncate max-w-[200px]">
+                        {item.courseName}
+                      </td>
+                      <td className="px-3 py-2 text-sm text-gray-700">{item.enrollmentCount}</td>
+                      <td className="px-3 py-2 text-sm text-gray-700">{item.activeStudents}</td>
+                      <td className="px-3 py-2 text-sm text-gray-700">{item.completedStudents}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

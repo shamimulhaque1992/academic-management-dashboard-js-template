@@ -62,18 +62,18 @@ export default function FacultyPage() {
   });
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold">Faculty Management</h1>
+    <div className="p-4 max-w-[1600px] mx-auto">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Faculty Management</h1>
         
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
           {/* Search Bar */}
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <div className="relative flex-1 sm:flex-initial w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
             <input
               type="text"
               placeholder="Search faculty..."
-              className="pl-10 pr-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -82,16 +82,16 @@ export default function FacultyPage() {
           {/* Filter Button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="flex items-center justify-center px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors w-full sm:w-auto"
           >
-            <Filter size={20} className="mr-2" />
+            <Filter size={20} className="mr-2 text-gray-600" />
             Filters
           </button>
 
           {/* Export Button */}
           <button
             onClick={handleExport}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors w-full sm:w-auto"
           >
             <Download size={20} className="mr-2" />
             Export
@@ -100,7 +100,7 @@ export default function FacultyPage() {
           {/* Add Faculty Button */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
           >
             <Plus size={20} className="mr-2" />
             Add Faculty
@@ -110,18 +110,22 @@ export default function FacultyPage() {
 
       {/* Filters Panel */}
       {showFilters && (
-        <FacultyFilters
-          filters={filters}
-          setFilters={setFilters}
-        />
+        <div className="mb-6">
+          <FacultyFilters
+            filters={filters}
+            setFilters={setFilters}
+          />
+        </div>
       )}
 
       {/* Faculty List */}
-      <FacultyList 
-        faculty={filteredFaculty}
-        loading={loading}
-        onRefresh={() => setFaculty([...faculty])}
-      />
+      <div className="bg-white rounded-lg shadow-md">
+        <FacultyList 
+          faculty={filteredFaculty}
+          loading={loading}
+          onRefresh={() => setFaculty([...faculty])}
+        />
+      </div>
 
       {/* Add/Edit Faculty Modal */}
       <Modal

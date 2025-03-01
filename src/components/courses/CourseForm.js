@@ -30,11 +30,9 @@ export default function CourseForm({ course, faculty, onClose }) {
     e.preventDefault();
     try {
       if (course) {
-        // Update existing course
         await axios.put(`http://localhost:3001/courses/${course.id}`, formData);
         toast.success('Course updated successfully');
       } else {
-        // Add new course
         await axios.post('http://localhost:3001/courses', {
           ...formData,
           enrollmentCount: 0
@@ -42,7 +40,6 @@ export default function CourseForm({ course, faculty, onClose }) {
         toast.success('Course added successfully');
       }
 
-      // Refresh courses list
       const response = await axios.get('http://localhost:3001/courses');
       dispatch(setCourses(response.data));
       onClose();
@@ -53,18 +50,18 @@ export default function CourseForm({ course, faculty, onClose }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Course Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Course Code
           </label>
           <input
             type="text"
             value={formData.courseCode}
             onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
             placeholder="e.g., CS101"
           />
@@ -72,14 +69,14 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Title
           </label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
             placeholder="Course Title"
           />
@@ -87,32 +84,32 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Description */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Description
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={3}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
           />
         </div>
 
         {/* Credits */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Credits
           </label>
           <select
             value={formData.credits}
             onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
           >
             {[1, 2, 3, 4].map(credit => (
               <option key={credit} value={credit}>
-                {credit}
+                {credit} {credit === 1 ? 'Credit' : 'Credits'}
               </option>
             ))}
           </select>
@@ -120,13 +117,13 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Faculty */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Faculty
           </label>
           <select
             value={formData.facultyId}
             onChange={(e) => setFormData({ ...formData, facultyId: parseInt(e.target.value) })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
           >
             <option value="">Select Faculty</option>
@@ -140,14 +137,14 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Max Enrollment */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Maximum Enrollment
           </label>
           <input
             type="number"
             value={formData.maxEnrollment}
             onChange={(e) => setFormData({ ...formData, maxEnrollment: parseInt(e.target.value) })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
             min={1}
           />
@@ -155,13 +152,13 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Department */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Department
           </label>
           <select
             value={formData.department}
             onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             required
           >
             <option value="CSE">Computer Science</option>
@@ -173,30 +170,30 @@ export default function CourseForm({ course, faculty, onClose }) {
 
         {/* Syllabus */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Syllabus
           </label>
           <textarea
             value={formData.syllabus}
             onChange={(e) => setFormData({ ...formData, syllabus: e.target.value })}
             rows={4}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
             placeholder="Enter course syllabus..."
           />
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 mt-6">
+      <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+          className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {course ? 'Update' : 'Add'} Course
         </button>

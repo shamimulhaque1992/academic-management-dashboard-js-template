@@ -485,6 +485,279 @@
       "studentId": 5,
       "enrollmentDate": "2025-03-01T10:47:59.734Z",
       "grade": null
+    },
+    {
+      "id": "280b",
+      "courseId": "1",
+      "studentId": "1",
+      "enrollmentDate": "2025-03-01T17:26:43.143Z",
+      "grade": null
+    },
+    {
+      "id": "f437",
+      "courseId": "1",
+      "studentId": "2",
+      "enrollmentDate": "2025-03-01T17:26:43.144Z",
+      "grade": null
+    },
+    {
+      "id": "3cc0",
+      "courseId": "1",
+      "studentId": "3",
+      "enrollmentDate": "2025-03-01T17:26:43.145Z",
+      "grade": null
+    },
+    {
+      "id": "02c5",
+      "courseId": "1",
+      "studentId": "4",
+      "enrollmentDate": "2025-03-01T17:26:43.147Z",
+      "grade": null
+    },
+    {
+      "id": "a0ae",
+      "courseId": "1",
+      "studentId": "5",
+      "enrollmentDate": "2025-03-01T17:26:43.148Z",
+      "grade": null
+    },
+    {
+      "id": "da7a",
+      "courseId": "1",
+      "studentId": "1",
+      "enrollmentDate": "2025-03-01T17:26:54.551Z",
+      "grade": null
+    },
+    {
+      "id": "6cde",
+      "courseId": "1",
+      "studentId": "2",
+      "enrollmentDate": "2025-03-01T17:26:54.553Z",
+      "grade": null
+    },
+    {
+      "id": "2885",
+      "courseId": "1",
+      "studentId": "3",
+      "enrollmentDate": "2025-03-01T17:26:54.554Z",
+      "grade": null
+    },
+    {
+      "id": "4998",
+      "courseId": "1",
+      "studentId": "4",
+      "enrollmentDate": "2025-03-01T17:26:54.555Z",
+      "grade": null
+    },
+    {
+      "id": "eec3",
+      "courseId": "1",
+      "studentId": "5",
+      "enrollmentDate": "2025-03-01T17:26:54.556Z",
+      "grade": null
+    },
+    {
+      "id": "3c77",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:28:18.962Z",
+      "grade": null
+    },
+    {
+      "id": "8168",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:28:18.963Z",
+      "grade": null
+    },
+    {
+      "id": "bdfe",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:28:18.964Z",
+      "grade": null
+    },
+    {
+      "id": "9739",
+      "courseId": 1,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T17:28:18.966Z",
+      "grade": null
+    },
+    {
+      "id": "267f",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:30:30.637Z",
+      "grade": null
+    },
+    {
+      "id": "1e5d",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:30:30.638Z",
+      "grade": null
+    },
+    {
+      "id": "b671",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:39:22.614Z",
+      "grade": null
+    },
+    {
+      "id": "6e04",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:39:22.615Z",
+      "grade": null
+    },
+    {
+      "id": "d270",
+      "courseId": 2,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:40:03.686Z",
+      "grade": null
+    },
+    {
+      "id": "5d27",
+      "courseId": 2,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:40:03.688Z",
+      "grade": null
+    },
+    {
+      "id": "73f2",
+      "courseId": 2,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:40:03.689Z",
+      "grade": null
+    },
+    {
+      "id": "bb1d",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:42:33.426Z",
+      "grade": null
+    },
+    {
+      "id": "33c6",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:42:33.428Z",
+      "grade": null
+    },
+    {
+      "id": "efaf",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:42:33.429Z",
+      "grade": null
+    },
+    {
+      "id": "21d2",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:44:12.528Z",
+      "grade": null
+    },
+    {
+      "id": "3d18",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:44:12.529Z",
+      "grade": null
+    },
+    {
+      "id": "beca",
+      "courseId": 1,
+      "studentId": 5,
+      "enrollmentDate": "2025-03-01T17:45:50.879Z",
+      "grade": null
+    },
+    {
+      "id": "e220",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:45:50.872Z",
+      "grade": null
+    },
+    {
+      "id": "b8db",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:45:50.874Z",
+      "grade": null
+    },
+    {
+      "id": "d3ad",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:45:50.876Z",
+      "grade": null
+    },
+    {
+      "id": "96cf",
+      "courseId": 1,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T17:45:50.878Z",
+      "grade": null
+    },
+    {
+      "id": "475e",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:46:07.401Z",
+      "grade": null
+    },
+    {
+      "id": "dce3",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:46:07.402Z",
+      "grade": null
+    },
+    {
+      "id": "e90f",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T17:46:07.403Z",
+      "grade": null
+    },
+    {
+      "id": "2acd",
+      "courseId": 1,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T17:46:07.405Z",
+      "grade": null
+    },
+    {
+      "id": "df79",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:48:24.733Z",
+      "grade": null
+    },
+    {
+      "id": "d189",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:48:24.735Z",
+      "grade": null
+    },
+    {
+      "id": "5650",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T17:51:02.546Z",
+      "grade": null
+    },
+    {
+      "id": "0793",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T17:51:02.547Z",
+      "grade": null
     }
   ],
   "faculty-courses": [

@@ -106,38 +106,80 @@ export default function TopPerformers() {
   const courseChartOptions = {
     chart: {
       type: 'bar',
-      height: 400
+      height: 400,
+      toolbar: {
+        show: true,
+        tools: {
+          download: true,
+          selection: false,
+          zoom: false,
+          zoomin: false,
+          zoomout: false,
+          pan: false,
+        }
+      },
+      animations: {
+        enabled: true
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          legend: {
+            position: 'bottom',
+            offsetY: 7
+          }
+        }
+      }]
     },
     plotOptions: {
       bar: {
         horizontal: true,
-        columnWidth: '55%',
-        borderRadius: 4
+        barHeight: '70%',
+        borderRadius: 4,
+        dataLabels: {
+          position: 'right'
+        }
       }
     },
     dataLabels: {
       enabled: true,
       formatter: function(val) {
         return val.toFixed(2);
+      },
+      style: {
+        fontSize: '11px',
+        fontFamily: 'inherit'
       }
     },
     xaxis: {
       categories: performanceData.courseWise?.map(course => course.courseName) || [],
+      labels: {
+        style: {
+          fontSize: '10px',
+          fontFamily: 'inherit'
+        }
+      },
       title: {
-        text: 'Average GPA'
+        text: 'Average GPA',
+        style: {
+          fontSize: '12px'
+        }
       }
     },
     yaxis: {
-      title: {
-        text: 'Courses'
+      labels: {
+        style: {
+          fontSize: '10px'
+        }
       }
     },
     colors: ['#3B82F6'],
     title: {
-      text: 'Course-wise Performance (Average GPA)',
+      text: 'Course Performance',
       align: 'center',
       style: {
-        fontSize: '20px'
+        fontSize: '16px',
+        fontWeight: '600'
       }
     }
   };
@@ -186,12 +228,12 @@ export default function TopPerformers() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-x-4">
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedView('course')}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedView === 'course'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -201,7 +243,7 @@ export default function TopPerformers() {
           </button>
           <button
             onClick={() => setSelectedView('overall')}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedView === 'overall'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -212,95 +254,119 @@ export default function TopPerformers() {
         </div>
         <button
           onClick={handleExport}
-          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          className="flex items-center px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
         >
-          <Download size={20} className="mr-2" />
-          Export Data
+          <Download size={16} className="mr-2" />
+          Export
         </button>
       </div>
 
-      <div className="mt-4">
-        <Chart
-          options={selectedView === 'course' ? courseChartOptions : overallChartOptions}
-          series={[{
-            name: 'Average GPA',
-            data: selectedView === 'course'
-              ? performanceData.courseWise?.map(course => course.averageGPA) || []
-              : performanceData.overall?.map(student => student.averageGPA) || []
-          }]}
-          type="bar"
-          height={400}
-        />
+      <div className="mt-4 -mx-2 sm:mx-0">
+        <div className="w-full overflow-hidden">
+          <div className="min-w-[300px]">
+            <Chart
+              options={{
+                ...(selectedView === 'course' ? courseChartOptions : overallChartOptions),
+                chart: {
+                  ...(selectedView === 'course' ? courseChartOptions : overallChartOptions).chart,
+                  toolbar: {
+                    show: true,
+                    tools: {
+                      download: true,
+                      selection: false,
+                      zoom: false,
+                      zoomin: false,
+                      zoomout: false,
+                      pan: false,
+                    }
+                  }
+                }
+              }}
+              series={[{
+                name: 'Average GPA',
+                data: selectedView === 'course'
+                  ? performanceData.courseWise?.map(course => course.averageGPA) || []
+                  : performanceData.overall?.map(student => student.averageGPA) || []
+              }]}
+              type="bar"
+              height={350}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Detailed Table */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold mb-4">
+      <div className="mt-6">
+        <h3 className="text-base font-semibold text-gray-800 mb-3">
           {selectedView === 'course' ? 'Course-wise Top Performers' : 'Overall Top Performers'}
         </h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              {selectedView === 'course' ? (
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Top Students
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grade
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    GPA
-                  </th>
-                </tr>
-              ) : (
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Courses Completed
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Average GPA
-                  </th>
-                </tr>
-              )}
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {selectedView === 'course' ? (
-                performanceData.courseWise?.map((course, idx) => (
-                  course.topStudents.map((student, studentIdx) => (
-                    <tr key={`${idx}-${studentIdx}`}>
-                      {studentIdx === 0 && (
-                        <td className="px-6 py-4 whitespace-nowrap" rowSpan={course.topStudents.length}>
-                          {course.courseName}
-                        </td>
-                      )}
-                      <td className="px-6 py-4 whitespace-nowrap">{student.studentName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{student.grade}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{student.gpa.toFixed(2)}</td>
+        <div className="overflow-x-auto -mx-2 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden border border-gray-200 sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  {selectedView === 'course' ? (
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Course
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Student
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Grade
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        GPA
+                      </th>
                     </tr>
-                  ))
-                ))
-              ) : (
-                performanceData.overall?.map((student, idx) => (
-                  <tr key={idx}>
-                    <td className="px-6 py-4 whitespace-nowrap">{student.studentName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{student.studentId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{student.enrollments}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{student.averageGPA.toFixed(2)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                  ) : (
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Student
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Courses
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        GPA
+                      </th>
+                    </tr>
+                  )}
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {selectedView === 'course' ? (
+                    performanceData.courseWise?.map((course, idx) => (
+                      course.topStudents.map((student, studentIdx) => (
+                        <tr key={`${idx}-${studentIdx}`} className="hover:bg-gray-50">
+                          {studentIdx === 0 && (
+                            <td className="px-3 py-2 text-sm text-gray-900 font-medium" rowSpan={course.topStudents.length}>
+                              {course.courseName}
+                            </td>
+                          )}
+                          <td className="px-3 py-2 text-sm text-gray-900">{student.studentName}</td>
+                          <td className="px-3 py-2 text-sm text-gray-700">{student.grade}</td>
+                          <td className="px-3 py-2 text-sm text-gray-700">{student.gpa.toFixed(2)}</td>
+                        </tr>
+                      ))
+                    ))
+                  ) : (
+                    performanceData.overall?.map((student, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-3 py-2 text-sm text-gray-900">{student.studentName}</td>
+                        <td className="px-3 py-2 text-sm text-gray-700">{student.studentId}</td>
+                        <td className="px-3 py-2 text-sm text-gray-700">{student.enrollments}</td>
+                        <td className="px-3 py-2 text-sm text-gray-700">{student.averageGPA.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

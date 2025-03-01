@@ -12,17 +12,17 @@ export default function StudentFilters({ filters, setFilters, courses }) {
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Year Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Year
           </label>
           <select
             value={filters.year}
             onChange={(e) => setFilters({ ...filters, year: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
           >
             <option value="">All Years</option>
             {years.map((year) => (
@@ -35,13 +35,13 @@ export default function StudentFilters({ filters, setFilters, courses }) {
 
         {/* Course Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Course
           </label>
           <select
             value={filters.course}
             onChange={(e) => setFilters({ ...filters, course: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
           >
             <option value="">All Courses</option>
             {courses.map((course) => (
@@ -54,13 +54,13 @@ export default function StudentFilters({ filters, setFilters, courses }) {
 
         {/* GPA Range Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             GPA Range
           </label>
           <select
             value={filters.gpaRange}
             onChange={(e) => setFilters({ ...filters, gpaRange: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
           >
             {gpaRanges.map((range) => (
               <option key={range.value} value={range.value}>

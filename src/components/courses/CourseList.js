@@ -35,12 +35,16 @@ export default function CourseList({ courses, faculty, loading }) {
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
   }
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -70,50 +74,59 @@ export default function CourseList({ courses, faculty, loading }) {
                 const facultyMember = faculty.find(f => f.id === course.facultyId);
                 return (
                   <tr key={course.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                       {course.courseCode}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-800">
                         {course.title}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {facultyMember?.name || 'Not Assigned'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {facultyMember?.designation}
+                      <div>
+                        <div className="text-sm font-medium text-gray-800">
+                          {facultyMember?.name || 'Not Assigned'}
+                        </div>
+                        {facultyMember && (
+                          <div className="text-sm text-gray-600">
+                            {facultyMember.designation}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {course.credits}
+                      <span className="px-2 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+                        {course.credits} {course.credits === 1 ? 'Credit' : 'Credits'}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Users className="h-5 w-5 text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm font-medium text-gray-700">
                           {course.enrollmentCount}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-3">
                         <button
                           onClick={() => handleView(course)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          title="View Details"
                         >
                           <Eye size={18} />
                         </button>
                         <button
                           onClick={() => handleEdit(course)}
-                          className="text-indigo-600 hover:text-indigo-900"
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                          title="Edit Course"
                         >
                           <Edit size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(course.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                          title="Delete Course"
                         >
                           <Trash2 size={18} />
                         </button>

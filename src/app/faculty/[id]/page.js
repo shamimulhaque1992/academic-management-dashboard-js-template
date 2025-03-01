@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { ArrowLeft, Book, Users, BarChart, Search, Save, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
+import CourseGradeManagement from '@/components/faculty/CourseGradeManagement';
+import FacultyDetails from '@/components/faculty/FacultyDetails';
 
 export default function FacultyDashboard({ params }) {
   const router = useRouter();
@@ -13,7 +15,7 @@ export default function FacultyDashboard({ params }) {
   const [enrollments, setEnrollments] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('details');
   
   // States for course assignment
   const [selectedCourse, setSelectedCourse] = useState('');
@@ -26,6 +28,28 @@ export default function FacultyDashboard({ params }) {
   // Add this to your existing state declarations
   const [assignedCourses, setAssignedCourses] = useState([]);
 
+  // Add the missing refreshEnrollmentsData function
+  const refreshEnrollmentsData = async () => {
+    try {
+      setLoading(true);
+      console.log('Refreshing enrollments data...');
+      const response = await axios.get('http://localhost:3001/enrollments');
+      console.log('New enrollments data:', response.data);
+      setEnrollments(response.data);
+      
+      // Also refresh students data to ensure we have the latest
+      const studentsRes = await axios.get('http://localhost:3001/students');
+      setStudents(studentsRes.data);
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error refreshing enrollments data:', error);
+      toast.error('Failed to refresh enrollments data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -35,6 +59,7 @@ export default function FacultyDashboard({ params }) {
       if (!params?.id) return;
 
       try {
+        setLoading(true);
         // First fetch faculty data
         const facultyRes = await axios.get(`http://localhost:3001/faculty/${params.id}`);
         setFaculty(facultyRes.data);
@@ -90,7 +115,7 @@ export default function FacultyDashboard({ params }) {
       }
     };
 
-    if (mounted && (activeTab === 'grades' || activeTab === 'assign')) {
+    if (mounted && (activeTab === 'grades' || activeTab === 'details')) {
       refreshEnrollments();
     }
   }, [activeTab, mounted]);
@@ -114,48 +139,49 @@ export default function FacultyDashboard({ params }) {
 
     try {
       console.log('Starting student assignment process...');
-      console.log('Selected Course:', selectedCourse);
-      console.log('Selected Students:', selectedStudents);
+      console.log('Selected course:', selectedCourse);
+      console.log('Selected students:', selectedStudents);
 
-      const newEnrollments = [];
+      // Check for existing enrollments
+      const existingEnrollments = enrollments.filter(
+        e => e.courseId === parseInt(selectedCourse) && selectedStudents.includes(e.studentId)
+      );
 
-      for (const studentId of selectedStudents) {
-        try {
-          // Check if enrollment already exists
-          const existingEnrollment = enrollments.find(
-            e => e.courseId === parseInt(selectedCourse) && e.studentId === parseInt(studentId)
-          );
+      if (existingEnrollments.length > 0) {
+        console.log('Found existing enrollments:', existingEnrollments);
+        const existingStudentIds = existingEnrollments.map(e => e.studentId);
+        const newStudents = selectedStudents.filter(id => !existingStudentIds.includes(id));
 
-          if (!existingEnrollment) {
-            const enrollmentData = {
-              courseId: parseInt(selectedCourse),
-              studentId: parseInt(studentId),
-              enrollmentDate: new Date().toISOString(),
-              grade: null
-            };
-
-            const response = await axios.post('http://localhost:3001/enrollments', enrollmentData);
-            newEnrollments.push(response.data);
-            console.log(`Enrolled student ${studentId} in course ${selectedCourse}`);
-          }
-        } catch (error) {
-          console.error(`Failed to enroll student ${studentId}:`, error);
+        if (newStudents.length === 0) {
+          toast.error('All selected students are already enrolled in this course');
+          return;
         }
+
+        // Update selected students to only include new ones
+        console.log('Proceeding with new students only:', newStudents);
+        setSelectedStudents(newStudents);
       }
 
-      // Update local state with new enrollments
-      if (newEnrollments.length > 0) {
-        setEnrollments(prev => [...prev, ...newEnrollments]);
-        toast.success('Students assigned successfully');
-        
-        // Refresh enrollments data
-        const refreshedEnrollments = await axios.get('http://localhost:3001/enrollments');
-        setEnrollments(refreshedEnrollments.data);
-      }
+      // Create enrollments for each student
+      const enrollmentPromises = selectedStudents.map(studentId =>
+        axios.post('http://localhost:3001/enrollments', {
+          courseId: parseInt(selectedCourse),
+          studentId: parseInt(studentId),
+          enrollmentDate: new Date().toISOString(),
+          grade: null
+        })
+      );
 
+      await Promise.all(enrollmentPromises);
+      console.log('All enrollments created successfully');
+
+      // Refresh enrollments data
+      await refreshEnrollmentsData();
+
+      toast.success('Students assigned successfully');
       setSelectedStudents([]);
     } catch (error) {
-      console.error('Error in handleAssignStudents:', error);
+      console.error('Error assigning students:', error);
       toast.error('Failed to assign students');
     }
   };
@@ -206,6 +232,7 @@ export default function FacultyDashboard({ params }) {
       if (!mounted) return;
       
       try {
+        setLoading(true);
         console.log('Refreshing data for tab:', activeTab);
         const [enrollmentsRes, studentsRes] = await Promise.all([
           axios.get('http://localhost:3001/enrollments'),
@@ -217,39 +244,43 @@ export default function FacultyDashboard({ params }) {
         setStudents(studentsRes.data);
       } catch (error) {
         console.error('Error refreshing data:', error);
+        toast.error('Failed to load data');
+      } finally {
+        setLoading(false);
       }
     };
 
     refreshData();
   }, [activeTab, mounted]);
 
-  // Update the filteredEnrollments definition
+  // Update the filteredEnrollments definition to properly handle course IDs
   const filteredEnrollments = useMemo(() => {
     if (!selectedCourse) return [];
     
     console.log('Filtering enrollments for course:', selectedCourse);
     console.log('All enrollments:', enrollments);
+    console.log('All students:', students);
     
     const filtered = enrollments.filter(enrollment => {
-      const courseMatch = enrollment.courseId === parseInt(selectedCourse);
-      if (!courseMatch) return false;
-
-      const student = students.find(s => s.id === enrollment.studentId);
-      if (!student) {
-        console.log(`No student found for enrollment ${enrollment.id}`);
+      // Convert both IDs to numbers for comparison
+      const courseMatch = enrollment.courseId === Number(selectedCourse);
+      if (!courseMatch) {
+        console.log(`Course mismatch for enrollment ${enrollment.id}: ${enrollment.courseId} !== ${selectedCourse}`);
         return false;
       }
 
-      const matchesSearch = !searchTerm || 
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
+      const student = students.find(s => s.id === enrollment.studentId);
+      if (!student) {
+        console.log(`No student found for enrollment ${enrollment.id} with studentId ${enrollment.studentId}`);
+        return false;
+      }
 
-      return matchesSearch;
+      return true;
     });
 
-    console.log('Filtered enrollments:', filtered);
+    console.log('Filtered enrollments result:', filtered);
     return filtered;
-  }, [selectedCourse, enrollments, students, searchTerm]);
+  }, [selectedCourse, enrollments, students]);
 
   // Add this effect to refresh data when switching to grades tab
   useEffect(() => {
@@ -293,7 +324,65 @@ export default function FacultyDashboard({ params }) {
     }
   }, [selectedCourse, enrollments]);
 
-  if (!mounted || loading) {
+  // Update handleCourseChange to ensure proper data loading
+  const handleCourseChange = async (courseId) => {
+    console.log('Course changed to:', courseId);
+    setSelectedCourse(courseId);
+    setSelectedStudents([]);
+    
+    if (courseId) {
+      setLoading(true);
+      try {
+        // Fetch fresh data when course changes
+        const [enrollmentsRes, studentsRes] = await Promise.all([
+          axios.get('http://localhost:3001/enrollments'),
+          axios.get('http://localhost:3001/students')
+        ]);
+        
+        console.log('Fetched new enrollments:', enrollmentsRes.data);
+        console.log('Fetched students:', studentsRes.data);
+        
+        setEnrollments(enrollmentsRes.data);
+        setStudents(studentsRes.data);
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+        toast.error('Failed to load course data');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Add a new effect to handle tab changes and course selection
+  useEffect(() => {
+    const loadGradeManagementData = async () => {
+      if (activeTab === 'grades' && selectedCourse) {
+        setLoading(true);
+        try {
+          const [enrollmentsRes, studentsRes] = await Promise.all([
+            axios.get('http://localhost:3001/enrollments'),
+            axios.get('http://localhost:3001/students')
+          ]);
+
+          console.log('Loading grade management data for course:', selectedCourse);
+          console.log('Fetched enrollments:', enrollmentsRes.data);
+          console.log('Fetched students:', studentsRes.data);
+
+          setEnrollments(enrollmentsRes.data);
+          setStudents(studentsRes.data);
+        } catch (error) {
+          console.error('Error loading grade management data:', error);
+          toast.error('Failed to load grade management data');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadGradeManagementData();
+  }, [activeTab, selectedCourse]);
+
+  if (!mounted) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
@@ -329,233 +418,27 @@ export default function FacultyDashboard({ params }) {
   const stats = calculateStats();
 
   const renderContent = () => {
+    if (!mounted) {
+      return <div className="flex justify-center items-center py-8">Initializing...</div>;
+    }
+
     switch (activeTab) {
-      case 'overview':
+      case 'details':
         return (
-          <>
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-blue-50 rounded-lg p-6">
-                <div className="flex items-center">
-                  <Book className="h-10 w-10 text-blue-500" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Total Courses</p>
-                    <p className="text-2xl font-bold text-blue-600">{stats.totalCourses}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-green-50 rounded-lg p-6">
-                <div className="flex items-center">
-                  <Users className="h-10 w-10 text-green-500" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Total Students</p>
-                    <p className="text-2xl font-bold text-green-600">{stats.totalStudents}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-6">
-                <div className="flex items-center">
-                  <BarChart className="h-10 w-10 text-purple-500" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Average Grade</p>
-                    <p className="text-2xl font-bold text-purple-600">{stats.averageGrade}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Courses Table */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Current Courses</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Course Code
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Title
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Students
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Average Grade
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {courses.map(course => {
-                      const courseEnrollments = enrollments.filter(e => e.courseId === course.id);
-                      const avgGrade = courseEnrollments.length > 0
-                        ? (courseEnrollments.reduce((acc, curr) => {
-                            const gradePoints = {
-                              'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0,
-                              'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'F': 0
-                            };
-                            return acc + (gradePoints[curr.grade] || 0);
-                          }, 0) / courseEnrollments.length).toFixed(2)
-                        : '0.00';
-
-                      return (
-                        <tr key={course.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">{course.courseCode}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{course.title}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{courseEnrollments.length}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{avgGrade}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
-        );
-
-      case 'assign':
-        return (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Assign Students to Course</h2>
-            
-            {assignedCourses.length === 0 ? (
-              <div className="text-center py-4 text-gray-600">
-                No courses assigned to this faculty member.
-              </div>
-            ) : (
-              <>
-                {/* Course Selection */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Select Course
-                  </label>
-                  <select
-                    value={selectedCourse}
-                    onChange={(e) => {
-                      setSelectedCourse(e.target.value);
-                      setSelectedStudents([]);
-                    }}
-                    className="w-full border rounded-md p-2"
-                  >
-                    <option value="">Choose a course</option>
-                    {assignedCourses.map(course => (
-                      <option key={course.id} value={course.id}>
-                        {course.courseCode} - {course.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {selectedCourse && (
-                  <>
-                    {/* Student Search */}
-                    <div className="relative mb-4">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                      <input
-                        type="text"
-                        placeholder="Search students..."
-                        className="pl-10 pr-4 py-2 w-full border rounded-lg"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Student List */}
-                    <div className="border rounded-lg overflow-hidden">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Select
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Student ID
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Name
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {filteredStudents.length === 0 ? (
-                            <tr>
-                              <td colSpan="3" className="px-6 py-4 text-center text-gray-500">
-                                No available students found
-                              </td>
-                            </tr>
-                          ) : (
-                            filteredStudents.map(student => (
-                              <tr key={student.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedStudents.includes(student.id.toString())}
-                                    onChange={(e) => {
-                                      if (e.target.checked) {
-                                        setSelectedStudents([...selectedStudents, student.id.toString()]);
-                                      } else {
-                                        setSelectedStudents(selectedStudents.filter(id => id !== student.id.toString()));
-                                      }
-                                    }}
-                                    className="rounded border-gray-300"
-                                  />
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">{student.studentId}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Assign Button */}
-                    <div className="mt-4 flex justify-end">
-                      <button
-                        onClick={handleAssignStudents}
-                        disabled={selectedStudents.length === 0}
-                        className={`flex items-center px-4 py-2 rounded-lg ${
-                          selectedStudents.length === 0
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        <Plus size={20} className="mr-2" />
-                        Assign Students
-                      </button>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        );
-
-      case 'grades':
-        return (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Manage Student Grades</h2>
-
+          <div className="space-y-6">
             {/* Course Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div>
+              <label htmlFor="course" className="block text-sm font-medium text-gray-700 mb-2">
                 Select Course
               </label>
               <select
+                id="course"
                 value={selectedCourse}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  setSelectedCourse(newValue);
-                  setGrades({});
-                  setSearchTerm('');
-                  console.log('Selected course changed to:', newValue);
-                  logCurrentState();
-                }}
-                className="w-full border rounded-md p-2"
+                onChange={(e) => handleCourseChange(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Choose a course</option>
-                {assignedCourses.map(course => (
+                <option value="">Select a course</option>
+                {courses.map((course) => (
                   <option key={course.id} value={course.id}>
                     {course.courseCode} - {course.title}
                   </option>
@@ -563,177 +446,187 @@ export default function FacultyDashboard({ params }) {
               </select>
             </div>
 
+            {/* Student Selection */}
             {selectedCourse && (
-              <>
-                {/* Debug Info */}
-                <div className="mb-4 p-2 bg-gray-100 rounded">
-                  <p>Total Enrollments: {enrollments.length}</p>
-                  <p>Filtered Enrollments: {filteredEnrollments.length}</p>
-                  <p>Selected Course: {selectedCourse}</p>
-                  <p>Course Enrollments: {enrollments.filter(e => e.courseId === parseInt(selectedCourse)).length}</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Students
+                </label>
+                <div className="max-h-60 overflow-y-auto border border-gray-300 rounded-md">
+                  {getAvailableStudents().map((student) => (
+                    <label
+                      key={student.id}
+                      className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedStudents.includes(student.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedStudents([...selectedStudents, student.id]);
+                          } else {
+                            setSelectedStudents(selectedStudents.filter((id) => id !== student.id));
+                          }
+                        }}
+                        className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">
+                        {student.name} ({student.studentId})
+                      </span>
+                    </label>
+                  ))}
                 </div>
+              </div>
+            )}
 
-                {/* Search */}
-                <div className="relative flex-1 max-w-md mb-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Search students..."
-                    className="pl-10 pr-4 py-2 w-full border rounded-lg"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                {/* Grades Table */}
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Student ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Current Grade
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Update Grade
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredEnrollments.length === 0 ? (
-                        <tr>
-                          <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                            No students found for this course
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredEnrollments.map(enrollment => {
-                          const student = students.find(s => s.id === enrollment.studentId);
-                          if (!student) return null;
-                          
-                          return (
-                            <tr key={enrollment.id}>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                {student.studentId}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                {student.name}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                {enrollment.grade || 'Not graded'}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <select
-                                  value={grades[enrollment.id] || ''}
-                                  onChange={(e) => setGrades({
-                                    ...grades,
-                                    [enrollment.id]: e.target.value
-                                  })}
-                                  className="border rounded px-2 py-1"
-                                >
-                                  <option value="">Select Grade</option>
-                                  {['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F'].map(grade => (
-                                    <option key={grade} value={grade}>{grade}</option>
-                                  ))}
-                                </select>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <button
-                                  onClick={() => handleGradeChange(enrollment.id, grades[enrollment.id])}
-                                  disabled={!grades[enrollment.id]}
-                                  className={`px-3 py-1 rounded ${
-                                    grades[enrollment.id]
-                                      ? 'bg-green-600 text-white hover:bg-green-700'
-                                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                  }`}
-                                >
-                                  Update
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </>
+            {/* Assign Button */}
+            {selectedCourse && (
+              <div>
+                <button
+                  onClick={handleAssignStudents}
+                  disabled={!selectedCourse || selectedStudents.length === 0}
+                  className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Assign Students
+                </button>
+              </div>
             )}
           </div>
         );
+
+      case 'grades':
+        if (loading) {
+          return <div className="flex justify-center items-center py-8">Loading grade management...</div>;
+        }
+        
+        console.log('Rendering grade management with:', {
+          courses,
+          selectedCourse,
+          filteredEnrollments,
+          students
+        });
+        
+        return (
+          <CourseGradeManagement
+            courses={courses}
+            selectedCourse={selectedCourse}
+            onCourseChange={handleCourseChange}
+            enrollments={filteredEnrollments}
+            students={students}
+            onEnrollmentsChange={refreshEnrollmentsData}
+            loading={loading}
+          />
+        );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Back Button */}
+      <div className="mb-6">
         <button
-          onClick={() => router.push('/faculty')}
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+          onClick={() => router.back()}
+          className="flex items-center text-gray-600 hover:text-gray-900"
         >
-          <ArrowLeft className="mr-2" size={20} />
-          Back to Faculty List
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          <span className="text-sm font-medium">Back to Faculty List</span>
         </button>
+      </div>
 
-        {/* Faculty Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">{faculty.name}</h1>
-              <p className="text-gray-600">Faculty ID: {faculty.facultyId}</p>
-              <p className="text-gray-600">{faculty.designation}</p>
-              <p className="text-gray-600">{faculty.email}</p>
-              <p className="text-gray-600">Department: {faculty.department}</p>
-              <p className="text-gray-600">Status: {faculty.status}</p>
-            </div>
-          </div>
-        </div>
+      {/* Faculty Header */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <FacultyDetails faculty={faculty} />
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b mb-6">
-          <nav className="flex space-x-8">
+      {/* Tabs */}
+      <div className="bg-white rounded-lg shadow-sm mb-6 overflow-x-auto">
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-4 p-4" aria-label="Tabs">
             <button
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('assign')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'assign'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              onClick={() => setActiveTab('details')}
+              className={`px-3 py-2 text-sm font-medium rounded-md ${
+                activeTab === 'details'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Course Assignment
             </button>
             <button
               onClick={() => setActiveTab('grades')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`px-3 py-2 text-sm font-medium rounded-md ${
                 activeTab === 'grades'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Grade Management
             </button>
           </nav>
         </div>
+      </div>
 
-        {/* Content Area */}
+      {/* Main Content */}
+      <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+        {activeTab === 'details' && (
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center">
+                  <Book className="h-8 w-8 text-blue-600" />
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-blue-600">Total Courses</p>
+                    <p className="text-xl font-bold text-blue-900">{stats.totalCourses}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="flex items-center">
+                  <Users className="h-8 w-8 text-green-600" />
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-green-600">Total Students</p>
+                    <p className="text-xl font-bold text-green-900">{stats.totalStudents}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <div className="flex items-center">
+                  <BarChart className="h-8 w-8 text-purple-600" />
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-purple-600">Average Grade</p>
+                    <p className="text-xl font-bold text-purple-900">{stats.averageGrade}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Faculty Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-gray-900">Email:</span> {faculty?.email}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-gray-900">Phone:</span> {faculty?.phone}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-gray-900">Department:</span> {faculty?.department}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-gray-900">Designation:</span> {faculty?.designation}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {renderContent()}
       </div>
     </div>

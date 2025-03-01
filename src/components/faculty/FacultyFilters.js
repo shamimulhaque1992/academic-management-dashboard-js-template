@@ -11,17 +11,17 @@ export default function FacultyFilters({ filters, setFilters }) {
   ];
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Department Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
             Department
           </label>
           <select
             value={filters.department}
             onChange={(e) => setFilters({ ...filters, department: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white"
           >
             <option value="">All Departments</option>
             {departments.map((dept) => (
@@ -34,13 +34,13 @@ export default function FacultyFilters({ filters, setFilters }) {
 
         {/* Designation Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
             Designation
           </label>
           <select
             value={filters.designation}
             onChange={(e) => setFilters({ ...filters, designation: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white"
           >
             <option value="">All Designations</option>
             {designations.map((designation) => (
@@ -53,13 +53,13 @@ export default function FacultyFilters({ filters, setFilters }) {
 
         {/* Status Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
             Status
           </label>
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="w-full border rounded-md p-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 bg-white"
           >
             {statuses.map((status) => (
               <option key={status.value} value={status.value}>
