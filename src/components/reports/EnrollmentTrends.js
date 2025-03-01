@@ -10,7 +10,9 @@ const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function EnrollmentTrends() {
   const [enrollmentData, setEnrollmentData] = useState([]);
+  const [timeframeData, setTimeframeData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedView, setSelectedView] = useState('current'); // 'current' or 'trend'
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,13 +25,26 @@ export default function EnrollmentTrends() {
         const courses = coursesRes.data;
         const enrollments = enrollmentsRes.data;
 
-        // Process data for visualization
-        const processedData = courses.map(course => ({
-          courseName: `${course.courseCode} - ${course.title}`,
-          enrollmentCount: enrollments.filter(e => e.courseId === course.id).length
+        // Process current enrollment data
+        const currentData = courses.map(course => {
+          const courseEnrollments = enrollments.filter(e => e.courseId === course.id);
+          return {
+            courseName: `${course.courseCode} - ${course.title}`,
+            enrollmentCount: courseEnrollments.length,
+            activeStudents: courseEnrollments.filter(e => !e.grade).length,
+            completedStudents: courseEnrollments.filter(e => e.grade).length
+          };
+        });
+
+        // Process time-based enrollment data (simulated for demo)
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const timeData = courses.map(course => ({
+          name: course.courseCode,
+          data: months.map(() => Math.floor(Math.random() * 30 + 10)) // Simulated data
         }));
 
-        setEnrollmentData(processedData);
+        setEnrollmentData(currentData);
+        setTimeframeData(timeData);
       } catch (error) {
         console.error('Error fetching enrollment data:', error);
       } finally {
@@ -41,13 +56,23 @@ export default function EnrollmentTrends() {
   }, []);
 
   const handleExport = () => {
-    exportToCSV(enrollmentData, 'course_enrollments');
+    const exportData = enrollmentData.map(item => ({
+      'Course': item.courseName,
+      'Total Enrollments': item.enrollmentCount,
+      'Active Students': item.activeStudents,
+      'Completed': item.completedStudents
+    }));
+    exportToCSV(exportData, 'course_enrollments');
   };
 
-  const chartOptions = {
+  const currentChartOptions = {
     chart: {
       type: 'bar',
-      height: 400
+      height: 400,
+      stacked: true,
+      toolbar: {
+        show: true
+      }
     },
     plotOptions: {
       bar: {
@@ -73,20 +98,62 @@ export default function EnrollmentTrends() {
         text: 'Number of Students'
       }
     },
-    colors: ['#3B82F6'],
+    colors: ['#3B82F6', '#10B981'],
     title: {
-      text: 'Course Enrollment Distribution',
+      text: 'Current Course Enrollment Distribution',
       align: 'center',
       style: {
         fontSize: '20px'
       }
+    },
+    legend: {
+      position: 'top'
     }
   };
 
-  const series = [{
-    name: 'Enrolled Students',
-    data: enrollmentData.map(item => item.enrollmentCount)
-  }];
+  const trendChartOptions = {
+    chart: {
+      type: 'line',
+      height: 400
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2
+    },
+    xaxis: {
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      title: {
+        text: 'Month'
+      }
+    },
+    yaxis: {
+      title: {
+        text: 'Number of Enrollments'
+      }
+    },
+    colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+    title: {
+      text: 'Enrollment Trends Over Time',
+      align: 'center',
+      style: {
+        fontSize: '20px'
+      }
+    },
+    legend: {
+      position: 'top'
+    }
+  };
+
+  const currentSeries = [
+    {
+      name: 'Active Students',
+      data: enrollmentData.map(item => item.activeStudents)
+    },
+    {
+      name: 'Completed',
+      data: enrollmentData.map(item => item.completedStudents)
+    }
+  ];
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -95,7 +162,28 @@ export default function EnrollmentTrends() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Course Enrollment Trends</h2>
+        <div className="space-x-4">
+          <button
+            onClick={() => setSelectedView('current')}
+            className={`px-4 py-2 rounded-lg ${
+              selectedView === 'current'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Current Distribution
+          </button>
+          <button
+            onClick={() => setSelectedView('trend')}
+            className={`px-4 py-2 rounded-lg ${
+              selectedView === 'trend'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Enrollment Trends
+          </button>
+        </div>
         <button
           onClick={handleExport}
           className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
@@ -106,12 +194,56 @@ export default function EnrollmentTrends() {
       </div>
 
       <div className="mt-4">
-        <Chart
-          options={chartOptions}
-          series={series}
-          type="bar"
-          height={400}
-        />
+        {selectedView === 'current' ? (
+          <Chart
+            options={currentChartOptions}
+            series={currentSeries}
+            type="bar"
+            height={400}
+          />
+        ) : (
+          <Chart
+            options={trendChartOptions}
+            series={timeframeData}
+            type="line"
+            height={400}
+          />
+        )}
+      </div>
+
+      {/* Summary Table */}
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold mb-4">Enrollment Summary</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Course
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total Enrollments
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Active Students
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Completed
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {enrollmentData.map((item, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.courseName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.enrollmentCount}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.activeStudents}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.completedStudents}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

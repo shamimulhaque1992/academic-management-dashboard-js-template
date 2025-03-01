@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Academic Management Dashboard
 
-## Getting Started
+## Author
+**Khandoker Shamimul Haque**
 
-First, run the development server:
+## Overview
+A comprehensive academic management system built with Next.js and modern web technologies. This dashboard provides faculty members and administrators with tools to manage courses, students, enrollments, and academic performance.
 
+## Features
+
+### Faculty Management
+- Add, edit, and view faculty members
+- Track faculty details including name, ID, department, and status
+- Assign courses to faculty members
+- View faculty-specific dashboards
+
+### Course Management
+- Manage course assignments for faculty members
+- Track course enrollments and performance
+- View course statistics and student distribution
+
+### Student Management
+- Assign students to courses
+- Track student enrollments across different courses
+- Monitor student performance and grades
+
+### Grade Management
+- Input and update student grades
+- View grade distribution per course
+- Track student academic progress
+- Individual grade updates with immediate feedback
+
+### Reporting & Analytics
+- View comprehensive enrollment trends
+- Track course performance metrics
+- Analyze top-performing students
+- Export reports in CSV format
+- Visual data representation through charts and graphs
+
+### Data Visualization
+- Interactive charts for enrollment trends
+- Performance analytics visualization
+- Course-wise student distribution
+- Grade distribution analysis
+
+### Export Functionality
+- Export faculty data
+- Download course enrollment reports
+- Generate performance reports
+- CSV format support for all exports
+
+## Technology Stack
+- Next.js 13+
+- React 18+
+- Tailwind CSS
+- ApexCharts for data visualization
+- Axios for API calls
+- JSON Server for backend mock API
+
+## Project Setup
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Git
+
+### Installation Steps
+
+1. Clone the repository
+```bash
+git clone https://github.com/shamimulhaque1992/academic-management-dashboard-js-template.git
+cd academic-management-dashboard-js-template
+```
+
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up the mock API server
+```bash
+# Install JSON Server globally
+npm install -g json-server
+
+# Start the JSON Server (in a separate terminal)
+json-server --watch db.json --port 3001
+```
+
+4. Start the development server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open your browser and navigate to
+```
+http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Database Structure
+The project uses a JSON Server with the following structure:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```json
+{
+  "faculty": [
+    {
+      "id": 1,
+      "name": "Faculty Name",
+      "facultyId": "FAC001",
+      "email": "faculty@example.com",
+      "department": "Computer Science",
+      "designation": "Professor",
+      "status": "active"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "courseCode": "CS101",
+      "title": "Introduction to Programming"
+    }
+  ],
+  "students": [
+    {
+      "id": 1,
+      "name": "Student Name",
+      "studentId": "STU001"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": 1,
+      "courseId": 1,
+      "studentId": 1,
+      "grade": "A",
+      "enrollmentDate": "2024-03-21T00:00:00.000Z"
+    }
+  ],
+  "faculty-courses": [
+    {
+      "id": 1,
+      "facultyId": 1,
+      "courseId": 1
+    }
+  ]
+}
+```
 
-## Learn More
+## Contributing
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To learn more about Next.js, take a look at the following resources:
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Acknowledgments
+- Next.js team for the amazing framework
+- Tailwind CSS for the utility-first CSS framework
+- ApexCharts for beautiful charts
+- All contributors who help improve this project

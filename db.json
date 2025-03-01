@@ -53,11 +53,16 @@
       "phone": "01612345678",
       "department": "CSE",
       "batch": "2020",
-      "gpa": 3.95,
+      "gpa": 4,
       "enrolledCourses": [
         2,
         4,
-        5
+        5,
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
       ]
     },
     {
@@ -166,8 +171,12 @@
       "status": "Active",
       "assignedCourses": [
         "1",
+        "2",
+        "4",
         "3",
-        "5"
+        "6",
+        "5",
+        "7"
       ]
     },
     {
@@ -234,13 +243,15 @@
       "name": "Dr. Rashid Khan",
       "email": "rashid.khan@example.com",
       "phone": "01755555555",
-      "department": "CSE",
       "designation": "Associate Professor",
-      "courses": [],
-      "specialization": "Cybersecurity",
-      "joinDate": "2020-09-01",
+      "department": "CSE",
       "status": "Active",
-      "assignedCourses": []
+      "assignedCourses": [
+        "1",
+        "3",
+        "5",
+        "7"
+      ]
     }
   ],
   "enrollments": [
@@ -327,6 +338,153 @@
       "studentId": 1,
       "enrollmentDate": "2025-03-01T09:56:10.120Z",
       "grade": null
+    },
+    {
+      "id": "c67d",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:02:03.289Z",
+      "grade": null
+    },
+    {
+      "id": "b241",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:02:03.292Z",
+      "grade": null
+    },
+    {
+      "id": "12b3",
+      "courseId": 5,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:02:24.769Z",
+      "grade": null
+    },
+    {
+      "id": "2c33",
+      "courseId": 5,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:02:24.771Z",
+      "grade": null
+    },
+    {
+      "id": "c3b5",
+      "courseId": 3,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:02:44.346Z",
+      "grade": null
+    },
+    {
+      "id": "8a1d",
+      "courseId": 3,
+      "studentId": 5,
+      "enrollmentDate": "2025-03-01T10:02:44.352Z",
+      "grade": null
+    },
+    {
+      "id": "b35e",
+      "courseId": 3,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:02:44.348Z",
+      "grade": null
+    },
+    {
+      "id": "3c6a",
+      "courseId": 3,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T10:02:44.349Z",
+      "grade": null
+    },
+    {
+      "id": "4f5f",
+      "courseId": 3,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T10:02:44.350Z",
+      "grade": null
+    },
+    {
+      "id": "188a",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:03:50.332Z",
+      "grade": null
+    },
+    {
+      "id": "f331",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:03:50.333Z",
+      "grade": null
+    },
+    {
+      "id": "f615",
+      "courseId": 1,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T10:06:29.472Z",
+      "grade": null
+    },
+    {
+      "id": "39b9",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:27:55.107Z",
+      "grade": null
+    },
+    {
+      "id": "e4fd",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:27:55.127Z",
+      "grade": null
+    },
+    {
+      "id": "c17d",
+      "courseId": 4,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:39:29.957Z",
+      "grade": null
+    },
+    {
+      "id": "cdfe",
+      "courseId": 4,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:39:29.987Z",
+      "grade": null
+    },
+    {
+      "id": "591c",
+      "courseId": 1,
+      "studentId": 1,
+      "enrollmentDate": "2025-03-01T10:47:59.690Z",
+      "grade": null
+    },
+    {
+      "id": "7109",
+      "courseId": 1,
+      "studentId": 2,
+      "enrollmentDate": "2025-03-01T10:47:59.702Z",
+      "grade": null
+    },
+    {
+      "id": "ced4",
+      "courseId": 1,
+      "studentId": 3,
+      "enrollmentDate": "2025-03-01T10:47:59.708Z",
+      "grade": null
+    },
+    {
+      "id": "b483",
+      "courseId": 1,
+      "studentId": 4,
+      "enrollmentDate": "2025-03-01T10:47:59.722Z",
+      "grade": null
+    },
+    {
+      "id": "3ff7",
+      "courseId": 1,
+      "studentId": 5,
+      "enrollmentDate": "2025-03-01T10:47:59.734Z",
+      "grade": null
     }
   ],
   "faculty-courses": [
@@ -356,19 +514,59 @@
       "courseId": 7
     },
     {
-      "id": "3893",
+      "id": "b402",
+      "facultyId": "5",
+      "courseId": 1
+    },
+    {
+      "id": "a54f",
+      "facultyId": "5",
+      "courseId": 3
+    },
+    {
+      "id": "18d3",
+      "facultyId": "5",
+      "courseId": 5
+    },
+    {
+      "id": "b30c",
+      "facultyId": "5",
+      "courseId": 7
+    },
+    {
+      "id": "af1c",
       "facultyId": "1",
       "courseId": 1
     },
     {
-      "id": "adfd",
+      "id": "59d5",
+      "facultyId": "1",
+      "courseId": 2
+    },
+    {
+      "id": "f0fc",
+      "facultyId": "1",
+      "courseId": 4
+    },
+    {
+      "id": "90ee",
       "facultyId": "1",
       "courseId": 3
     },
     {
-      "id": "a083",
+      "id": "8402",
+      "facultyId": "1",
+      "courseId": 6
+    },
+    {
+      "id": "80fa",
       "facultyId": "1",
       "courseId": 5
+    },
+    {
+      "id": "093c",
+      "facultyId": "1",
+      "courseId": 7
     }
   ]
 }
