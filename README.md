@@ -50,7 +50,7 @@ A comprehensive academic management system built with Next.js and modern web tec
 - CSV format support for all exports
 
 ## Technology Stack
-- Next.js 13+
+- Next.js 15
 - React 18+
 - Tailwind CSS
 - ApexCharts for data visualization
