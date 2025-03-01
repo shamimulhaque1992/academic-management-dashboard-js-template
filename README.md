@@ -85,7 +85,7 @@ yarn install
 npm install -g json-server
 
 # Start the JSON Server (in a separate terminal)
-json-server --watch db.json --port 3001
+npm run json-server
 ```
 
 4. Start the development server
