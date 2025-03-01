@@ -6,15 +6,16 @@ import FacultyForm from './FacultyForm';
 import FacultyDetails from './FacultyDetails';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function FacultyList({ faculty, loading, onRefresh }) {
+  const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
 
   const handleView = (member) => {
-    setSelectedFaculty(member);
-    setIsDetailsModalOpen(true);
+    router.push(`/faculty/${member.id}`);
   };
 
   const handleEdit = (member) => {
@@ -33,6 +34,28 @@ export default function FacultyList({ faculty, loading, onRefresh }) {
         toast.error('Failed to delete faculty member');
       }
     }
+  };
+
+  const getStatusColor = (status) => {
+    if (!status) return 'bg-gray-100 text-gray-800';
+    
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'on_leave':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatStatus = (status) => {
+    if (!status) return 'N/A';
+    
+    if (status.toLowerCase() === 'on_leave') return 'On Leave';
+    return status.charAt(0).toUpperCase() + status.toLowerCase().slice(1);
   };
 
   if (loading) {
@@ -59,9 +82,6 @@ export default function FacultyList({ faculty, loading, onRefresh }) {
                   Designation
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Courses
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -74,42 +94,30 @@ export default function FacultyList({ faculty, loading, onRefresh }) {
                 <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {member.facultyId}
+                      {member.facultyId || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {member.name}
+                      {member.name || 'N/A'}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {member.email}
+                      {member.email || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {member.department}
+                      {member.department || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {member.designation}
+                      {member.designation || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <BookOpen className="h-5 w-5 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">
-                        {member.assignedCourses?.length || 0}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${member.status === 'active' ? 'bg-green-100 text-green-800' : 
-                        member.status === 'on_leave' ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'}`}>
-                      {member.status === 'on_leave' ? 'On Leave' : 
-                        member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(member.status)}`}>
+                      {formatStatus(member.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -154,18 +162,6 @@ export default function FacultyList({ faculty, loading, onRefresh }) {
             setIsEditModalOpen(false);
             onRefresh();
           }}
-        />
-      </Modal>
-
-      {/* Details Modal */}
-      <Modal
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        title="Faculty Details"
-      >
-        <FacultyDetails
-          faculty={selectedFaculty}
-          onClose={() => setIsDetailsModalOpen(false)}
         />
       </Modal>
     </>

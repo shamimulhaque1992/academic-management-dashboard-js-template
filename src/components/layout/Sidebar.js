@@ -17,7 +17,7 @@ const menuItems = [
   { name: 'Students', icon: Users, href: '/students' },
   { name: 'Courses', icon: BookOpen, href: '/courses' },
   { name: 'Faculty', icon: GraduationCap, href: '/faculty' },
-  { name: 'Grades', icon: BarChart, href: '/grades' },
+  { name: 'Reports', icon: BarChart, href: '/reports' },
 ];
 
 export default function Sidebar() {

@@ -1,18 +1,22 @@
 {
   "students": [
     {
-      "id": 1,
+      "id": "1",
       "studentId": "CSE2019001",
       "name": "Abdullah Rahman",
       "email": "abdullah.rahman@example.com",
       "phone": "01712345678",
       "department": "CSE",
       "batch": "2019",
-      "gpa": 3.92,
-      "enrolledCourses": [1, 2, 3]
+      "gpa": 4,
+      "enrolledCourses": [
+        1,
+        2,
+        3
+      ]
     },
     {
-      "id": 2,
+      "id": "2",
       "studentId": "CSE2019002",
       "name": "Fatima Akter",
       "email": "fatima.akter@example.com",
@@ -20,108 +24,337 @@
       "department": "CSE",
       "batch": "2019",
       "gpa": 3.88,
-      "enrolledCourses": [1, 2, 4]
+      "enrolledCourses": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "id": "3",
+      "studentId": "CSE2020001",
+      "name": "Rahul Khan",
+      "email": "rahul.khan@example.com",
+      "phone": "01912345678",
+      "department": "CSE",
+      "batch": "2020",
+      "gpa": 3.75,
+      "enrolledCourses": [
+        1,
+        3,
+        5
+      ]
+    },
+    {
+      "id": "4",
+      "studentId": "CSE2020002",
+      "name": "Priya Islam",
+      "email": "priya.islam@example.com",
+      "phone": "01612345678",
+      "department": "CSE",
+      "batch": "2020",
+      "gpa": 3.95,
+      "enrolledCourses": [
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "5",
+      "studentId": "CSE2021001",
+      "name": "Karim Ahmed",
+      "email": "karim.ahmed@example.com",
+      "phone": "01512345678",
+      "department": "CSE",
+      "batch": "2021",
+      "gpa": 3.82,
+      "enrolledCourses": [
+        1,
+        2
+      ]
     }
   ],
   "courses": [
     {
-      "id": 1,
+      "id": "1",
       "courseCode": "CSE101",
       "title": "Introduction to Programming",
       "credits": 3,
       "facultyId": 1,
       "enrollmentCount": 45,
-      "description": "Basic concepts of programming using C/C++"
+      "description": "Basic concepts of programming using C/C++",
+      "department": "CSE",
+      "semester": "Fall 2023"
     },
     {
-      "id": 2,
+      "id": "2",
       "courseCode": "CSE201",
       "title": "Data Structures",
       "credits": 3,
       "facultyId": 2,
       "enrollmentCount": 40,
-      "description": "Fundamental data structures and algorithms"
+      "description": "Fundamental data structures and algorithms",
+      "department": "CSE",
+      "semester": "Fall 2023"
     },
     {
-      "id": 3,
+      "id": "3",
       "courseCode": "CSE203",
       "title": "Digital Logic Design",
       "credits": 3,
       "facultyId": 1,
       "enrollmentCount": 38,
-      "description": "Boolean algebra and digital circuits"
+      "description": "Boolean algebra and digital circuits",
+      "department": "CSE",
+      "semester": "Spring 2024"
     },
     {
-      "id": 4,
+      "id": "4",
       "courseCode": "CSE301",
       "title": "Database Management Systems",
       "credits": 3,
       "facultyId": 2,
       "enrollmentCount": 42,
-      "description": "Database design and SQL"
+      "description": "Database design and SQL",
+      "department": "CSE",
+      "semester": "Spring 2024"
     },
     {
-      "id": 5,
+      "id": "5",
       "courseCode": "CSE311",
       "title": "Computer Networks",
       "credits": 3,
       "facultyId": 3,
       "enrollmentCount": 35,
-      "description": "Network protocols and architecture"
+      "description": "Network protocols and architecture",
+      "department": "CSE",
+      "semester": "Spring 2024"
+    },
+    {
+      "id": "6",
+      "courseCode": "CSE401",
+      "title": "Artificial Intelligence",
+      "credits": 3,
+      "facultyId": 3,
+      "enrollmentCount": 30,
+      "description": "Introduction to AI and Machine Learning",
+      "department": "CSE",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": "7",
+      "courseCode": "CSE402",
+      "title": "Software Engineering",
+      "credits": 3,
+      "facultyId": 4,
+      "enrollmentCount": 38,
+      "description": "Software development lifecycle and methodologies",
+      "department": "CSE",
+      "semester": "Spring 2024"
     }
   ],
   "faculty": [
     {
-      "id": 1,
+      "id": "1",
+      "facultyId": "FAC001",
       "name": "Dr. Mohammad Islam",
       "email": "mohammad.islam@example.com",
+      "phone": "01711111111",
       "department": "CSE",
       "designation": "Professor",
-      "courses": [1, 3],
-      "specialization": "Computer Networks"
+      "courses": [
+        1,
+        3
+      ],
+      "specialization": "Computer Networks",
+      "joinDate": "2015-03-05",
+      "status": "Active",
+      "assignedCourses": [
+        "1",
+        "3"
+      ]
     },
     {
-      "id": 2,
+      "id": "2",
+      "facultyId": "FAC002",
       "name": "Dr. Ayesha Begum",
       "email": "ayesha.begum@example.com",
+      "phone": "01722222222",
       "department": "CSE",
       "designation": "Associate Professor",
-      "courses": [2, 4],
-      "specialization": "Database Systems"
+      "courses": [
+        2,
+        4
+      ],
+      "specialization": "Database Systems",
+      "joinDate": "2017-08-15",
+      "status": "Active",
+      "assignedCourses": [
+        "2",
+        "4"
+      ]
     },
     {
-      "id": 3,
+      "id": "3",
+      "facultyId": "FAC003",
       "name": "Dr. Kamal Hossain",
       "email": "kamal.hossain@example.com",
+      "phone": "01733333333",
       "department": "CSE",
       "designation": "Assistant Professor",
-      "courses": [5],
-      "specialization": "Artificial Intelligence"
+      "courses": [
+        5,
+        6
+      ],
+      "specialization": "Artificial Intelligence",
+      "joinDate": "2019-01-10",
+      "status": "Active",
+      "assignedCourses": [
+        "5",
+        "6"
+      ]
     },
     {
-      "id": 4,
+      "id": "4",
+      "facultyId": "FAC004",
       "name": "Prof. Nasrin Ahmed",
       "email": "nasrin.ahmed@example.com",
+      "phone": "01744444444",
       "department": "CSE",
       "designation": "Professor",
+      "courses": [
+        7
+      ],
+      "specialization": "Software Engineering",
+      "joinDate": "2016-06-20",
+      "status": "Active",
+      "assignedCourses": [
+        "7"
+      ]
+    },
+    {
+      "id": "5",
+      "facultyId": "FAC005",
+      "name": "Dr. Rashid Khan",
+      "email": "rashid.khan@example.com",
+      "phone": "01755555555",
+      "department": "CSE",
+      "designation": "Associate Professor",
       "courses": [],
-      "specialization": "Software Engineering"
+      "specialization": "Cybersecurity",
+      "joinDate": "2020-09-01",
+      "status": "Active",
+      "assignedCourses": []
     }
   ],
   "enrollments": [
     {
-      "id": 1,
+      "id": "1",
       "studentId": 1,
       "courseId": 1,
       "grade": "A",
       "semester": "Fall 2023"
     },
     {
-      "id": 2,
+      "id": "2",
       "studentId": 1,
       "courseId": 2,
       "grade": "A-",
       "semester": "Fall 2023"
+    },
+    {
+      "id": "3",
+      "studentId": 2,
+      "courseId": 1,
+      "grade": "B+",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": "4",
+      "studentId": 2,
+      "courseId": 4,
+      "grade": "A",
+      "semester": "Spring 2024"
+    },
+    {
+      "id": "5",
+      "studentId": 3,
+      "courseId": 1,
+      "grade": "A-",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": "6",
+      "studentId": 3,
+      "courseId": 5,
+      "grade": "B+",
+      "semester": "Spring 2024"
+    },
+    {
+      "id": "7",
+      "studentId": 4,
+      "courseId": 2,
+      "grade": "A",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": "8",
+      "studentId": 4,
+      "courseId": 5,
+      "grade": "A-",
+      "semester": "Spring 2024"
+    },
+    {
+      "id": "9",
+      "studentId": 5,
+      "courseId": 1,
+      "grade": "B+",
+      "semester": "Fall 2023"
+    },
+    {
+      "id": "10",
+      "studentId": 5,
+      "courseId": 2,
+      "grade": "A",
+      "semester": "Fall 2023"
+    }
+  ],
+  "faculty-courses": [
+    {
+      "id": 1,
+      "facultyId": 1,
+      "courseId": 1
+    },
+    {
+      "id": 2,
+      "facultyId": 1,
+      "courseId": 3
+    },
+    {
+      "id": 3,
+      "facultyId": 2,
+      "courseId": 2
+    },
+    {
+      "id": 4,
+      "facultyId": 2,
+      "courseId": 4
+    },
+    {
+      "id": 5,
+      "facultyId": 3,
+      "courseId": 5
+    },
+    {
+      "id": 6,
+      "facultyId": 3,
+      "courseId": 6
+    },
+    {
+      "id": 7,
+      "facultyId": 4,
+      "courseId": 7
     }
   ]
-} 
+}
